@@ -21,3 +21,45 @@
     @apply border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
   }
 }
+
+@layer utilities {
+  /* Voice recording animations */
+  @keyframes pulse-recording {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes audio-wave {
+    0%, 100% {
+      transform: scaleY(1);
+    }
+    50% {
+      transform: scaleY(0.5);
+    }
+  }
+
+  .animate-pulse-recording {
+    animation: pulse-recording 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-audio-wave {
+    animation: audio-wave 0.5s ease-in-out infinite;
+  }
+
+  /* Recording indicator dot */
+  .recording-dot {
+    @apply w-3 h-3 bg-red-600 rounded-full;
+    animation: pulse-recording 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Audio visualizer bars */
+  .audio-bar {
+    @apply bg-gradient-to-t from-blue-500 to-blue-300 rounded-full;
+    animation: audio-wave calc(0.5s + var(--delay)) ease-in-out infinite;
+    transform-origin: bottom;
+  }
+}
