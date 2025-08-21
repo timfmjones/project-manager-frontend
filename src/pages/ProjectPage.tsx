@@ -1,3 +1,4 @@
+// src/pages/ProjectPage.tsx
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useProject } from '../hooks/useProject';
@@ -15,7 +16,7 @@ import { api } from '../lib/api';
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>();
   const { project, loading, updateProject } = useProject(id!);
-  const { tasks, createTask, updateTask } = useTasks(id!);
+  const { tasks, createTask, updateTask, deleteTask } = useTasks(id!);
   const { insights, refetch: refetchInsights, togglePin } = useInsights(id!);
   const { milestones, createMilestone, updateMilestone, deleteMilestone } = useMilestones(id!);
   const [suggestedSummary, setSuggestedSummary] = useState<string | null>(null);
@@ -51,8 +52,8 @@ export function ProjectPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">{project.name}</h1>
+    <div className="max-w-7xl mx-auto">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">{project.name}</h1>
       
       <SummaryBanner
         projectId={project.id}
@@ -65,16 +66,20 @@ export function ProjectPage() {
         onRecorded={refetchInsights}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      {/* Mobile-optimized layout */}
+      <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-6">
+        {/* Tasks section - full width on mobile, 2 cols on desktop */}
+        <div className="lg:col-span-2 order-1 lg:order-1">
           <KanbanBoard
             tasks={tasks}
             onTaskUpdate={updateTask}
             onTaskCreate={createTask}
+            onTaskDelete={deleteTask}
           />
         </div>
         
-        <div className="space-y-6">
+        {/* Insights and Milestones - stacked on mobile, sidebar on desktop */}
+        <div className="space-y-6 order-2 lg:order-2">
           <InsightsFeed
             insights={insights}
             onPinToggle={togglePin}

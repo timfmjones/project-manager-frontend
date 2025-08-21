@@ -1,3 +1,4 @@
+// src/hooks/useTasks.ts
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { Task } from '../lib/types';
@@ -38,6 +39,15 @@ export function useTasks(projectId: string) {
     }
   };
 
+  const deleteTask = async (taskId: string) => {
+    try {
+      await api.delete(`/api/tasks/${taskId}`);
+      setTasks(prev => prev.filter(t => t.id !== taskId));
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
   }, [projectId]);
@@ -47,6 +57,7 @@ export function useTasks(projectId: string) {
     loading,
     createTask,
     updateTask,
+    deleteTask,
     refetch: fetchTasks,
   };
 }
