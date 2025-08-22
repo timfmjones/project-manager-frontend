@@ -27,20 +27,6 @@ export function LoginForm() {
 
   return (
     <div className="space-y-4">
-      {/* Google Sign-In Button */}
-      <GoogleSignInButton mode="login" />
-      
-      {/* Divider */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-500">Or continue with email</span>
-        </div>
-      </div>
-
-      {/* Email/Password Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded">
@@ -89,6 +75,8 @@ export function LoginForm() {
           </Link>
         </p>
       </form>
+
+      <GoogleSignInButton mode="signin" />
     </div>
   );
 }
