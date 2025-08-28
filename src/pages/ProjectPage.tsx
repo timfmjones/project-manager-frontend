@@ -11,12 +11,13 @@ import { RecordThoughts } from '../components/projects/RecordThoughts';
 import { InsightsFeed } from '../components/projects/InsightsFeed';
 import { KanbanBoard } from '../components/projects/KanbanBoard';
 import { MilestonesPanel } from '../components/projects/MilestonesPanel';
+import { QAAssistant } from '../components/projects/QAAssistant';
 import { api } from '../lib/api';
 
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>();
   const { project, loading, updateProject } = useProject(id!);
-  const { tasks, createTask, updateTask, deleteTask } = useTasks(id!);
+  const { tasks, createTask, updateTask, deleteTask, refetch: refetchTasks } = useTasks(id!);
   const { insights, refetch: refetchInsights, togglePin } = useInsights(id!);
   const { milestones, createMilestone, updateMilestone, deleteMilestone } = useMilestones(id!);
   const [suggestedSummary, setSuggestedSummary] = useState<string | null>(null);
@@ -101,6 +102,13 @@ export function ProjectPage() {
           onReject={() => setSuggestedSummary(null)}
         />
       )}
+
+      {/* Q&A Assistant - floating button/panel */}
+      <QAAssistant 
+        projectId={project.id}
+        projectName={project.name}
+        onTasksCreated={refetchTasks}
+      />
     </div>
   );
 }

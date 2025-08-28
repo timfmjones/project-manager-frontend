@@ -52,3 +52,25 @@ export interface Milestone {
   dueDate?: string;
   createdAt: string;
 }
+
+// Q&A Types
+export interface QAQuestion {
+  id: string;
+  projectId: string;
+  question: string;
+  answer: string;
+  suggestions: string[];
+  examples?: string[];
+  helpful?: boolean | null;
+  createdAt: string;
+}
+
+export interface QAResponse {
+  id: string;
+  question: string;
+  answer: string;
+  suggestions: string[];
+  examples?: string[];
+  suggestedTasks?: Array<{ title: string; description?: string }>;
+  createdAt: string;
+}
