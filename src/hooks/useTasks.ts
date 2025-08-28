@@ -1,4 +1,3 @@
-// src/hooks/useTasks.ts - Complete hook with ALL functionality including delete
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { Task } from '../lib/types';
@@ -31,32 +30,33 @@ export function useTasks(projectId: string) {
   };
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
+    // Optimistic update
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
+    
     try {
       const response = await api.patch(`/api/tasks/${taskId}`, updates);
       setTasks(prev => prev.map(t => t.id === taskId ? response.data : t));
     } catch (error) {
+      // Revert on error
       console.error('Failed to update task:', error);
+      fetchTasks(); // Refetch to get correct state
     }
   };
 
   const deleteTask = async (taskId: string) => {
+    // Optimistic update - remove the task immediately
+    const taskToDelete = tasks.find(t => t.id === taskId);
+    setTasks(prev => prev.filter(t => t.id !== taskId));
+    
     try {
       await api.delete(`/api/tasks/${taskId}`);
-      setTasks(prev => prev.filter(t => t.id !== taskId));
     } catch (error) {
+      // Revert on error - add the task back
       console.error('Failed to delete task:', error);
-    }
-  };
-
-  const reorderTasks = async (orderedIds: string[]) => {
-    try {
-      await api.patch(`/api/projects/${projectId}/tasks/reorder`, {
-        orderedIds,
-      });
-      // Optionally refetch to ensure consistency
-      await fetchTasks();
-    } catch (error) {
-      console.error('Failed to reorder tasks:', error);
+      if (taskToDelete) {
+        setTasks(prev => [...prev, taskToDelete]);
+      }
+      fetchTasks(); // Refetch to get correct state
     }
   };
 
@@ -70,7 +70,6 @@ export function useTasks(projectId: string) {
     createTask,
     updateTask,
     deleteTask,
-    reorderTasks,
     refetch: fetchTasks,
   };
 }
