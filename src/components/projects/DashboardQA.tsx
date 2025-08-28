@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { api } from '../../lib/api';
 import { Project } from '../../lib/types';
 
 interface DashboardQAProps {
@@ -29,18 +28,8 @@ export function DashboardQA({ projects }: DashboardQAProps) {
     setAnswer(null);
 
     try {
-      // For dashboard-level questions, we'll use a generic endpoint
-      // or analyze across all projects
-      const projectSummaries = projects.map(p => ({
-        name: p.name,
-        summary: p.summaryBanner || 'No summary',
-        lastUpdated: p.updatedAt
-      }));
-
-      // Since the backend Q&A is project-specific, we'll need to either:
-      // 1. Create a new endpoint for dashboard-level Q&A
-      // 2. Or use the first/main project as context
-      // For now, let's provide a helpful response based on available data
+      // For dashboard-level questions, we'll analyze across all projects
+      // Since the backend Q&A is project-specific, we provide intelligent responses based on available data
       
       if (projects.length === 0) {
         setAnswer({
