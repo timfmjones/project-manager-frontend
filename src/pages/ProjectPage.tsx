@@ -1,4 +1,3 @@
-// src/pages/ProjectPage.tsx
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useProject } from '../hooks/useProject';
@@ -11,21 +10,28 @@ import { RecordThoughts } from '../components/projects/RecordThoughts';
 import { InsightsFeed } from '../components/projects/InsightsFeed';
 import { KanbanBoard } from '../components/projects/KanbanBoard';
 import { MilestonesPanel } from '../components/projects/MilestonesPanel';
+import { Insight } from '../lib/types';
 import { api } from '../lib/api';
 
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>();
   const { project, loading, updateProject } = useProject(id!);
-  const { tasks, createTask, updateTask, deleteTask } = useTasks(id!);
-  const { insights, refetch: refetchInsights, togglePin } = useInsights(id!);
+  const { tasks, createTask, updateTask, refetch: refetchTasks } = useTasks(id!);
+  const { insights, togglePin, refetch: refetchInsights } = useInsights(id!);
   const { milestones, createMilestone, updateMilestone, deleteMilestone } = useMilestones(id!);
   const [suggestedSummary, setSuggestedSummary] = useState<string | null>(null);
+  const [localInsights, setLocalInsights] = useState<Insight[]>([]);
+
+  // Initialize local insights when insights are loaded
+  useEffect(() => {
+    setLocalInsights(insights);
+  }, [insights]);
 
   useEffect(() => {
-    if (insights.length >= 3 && !project?.summaryBanner) {
+    if (localInsights.length >= 3 && !project?.summaryBanner) {
       suggestSummary();
     }
-  }, [insights.length, project?.summaryBanner]);
+  }, [localInsights.length, project?.summaryBanner]);
 
   const suggestSummary = async () => {
     try {
@@ -43,6 +49,47 @@ export function ProjectPage() {
     }
   };
 
+  // Handle new insight being generated
+  const handleInsightGenerated = (newInsight: Insight) => {
+    // Add the new insight to the beginning of the list (most recent first)
+    setLocalInsights(prevInsights => [newInsight, ...prevInsights]);
+    
+    // Check if we should suggest a summary
+    if (localInsights.length + 1 >= 3 && !project?.summaryBanner) {
+      suggestSummary();
+    }
+  };
+
+  // Handle tasks being created (refresh the tasks list)
+  const handleTasksCreated = (count: number) => {
+    if (count > 0) {
+      refetchTasks();
+    }
+  };
+
+  // Handle pin toggle with optimistic update
+  const handlePinToggle = async (insightId: string, pinned: boolean) => {
+    // Optimistically update local state
+    setLocalInsights(prevInsights =>
+      prevInsights.map(insight =>
+        insight.id === insightId ? { ...insight, pinned } : insight
+      )
+    );
+    
+    // Then make the API call
+    try {
+      await togglePin(insightId, pinned);
+    } catch (error) {
+      // If it fails, revert the optimistic update
+      setLocalInsights(prevInsights =>
+        prevInsights.map(insight =>
+          insight.id === insightId ? { ...insight, pinned: !pinned } : insight
+        )
+      );
+      console.error('Failed to toggle pin:', error);
+    }
+  };
+
   if (loading || !project) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -52,8 +99,8 @@ export function ProjectPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">{project.name}</h1>
+    <div>
+      <h1 className="text-2xl font-bold mb-6">{project.name}</h1>
       
       <SummaryBanner
         projectId={project.id}
@@ -63,26 +110,23 @@ export function ProjectPage() {
 
       <RecordThoughts
         projectId={project.id}
-        onRecorded={refetchInsights}
+        onInsightGenerated={handleInsightGenerated}
+        onTasksCreated={handleTasksCreated}
       />
 
-      {/* Mobile-optimized layout */}
-      <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-6">
-        {/* Tasks section - full width on mobile, 2 cols on desktop */}
-        <div className="lg:col-span-2 order-1 lg:order-1">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
           <KanbanBoard
             tasks={tasks}
             onTaskUpdate={updateTask}
             onTaskCreate={createTask}
-            onTaskDelete={deleteTask}
           />
         </div>
         
-        {/* Insights and Milestones - stacked on mobile, sidebar on desktop */}
-        <div className="space-y-6 order-2 lg:order-2">
+        <div className="space-y-6">
           <InsightsFeed
-            insights={insights}
-            onPinToggle={togglePin}
+            insights={localInsights}
+            onPinToggle={handlePinToggle}
           />
           
           <MilestonesPanel

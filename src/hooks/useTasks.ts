@@ -1,4 +1,3 @@
-// src/hooks/useTasks.ts
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { Task } from '../lib/types';
@@ -31,20 +30,16 @@ export function useTasks(projectId: string) {
   };
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
+    // Optimistic update
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
+    
     try {
       const response = await api.patch(`/api/tasks/${taskId}`, updates);
       setTasks(prev => prev.map(t => t.id === taskId ? response.data : t));
     } catch (error) {
+      // Revert on error
       console.error('Failed to update task:', error);
-    }
-  };
-
-  const deleteTask = async (taskId: string) => {
-    try {
-      await api.delete(`/api/tasks/${taskId}`);
-      setTasks(prev => prev.filter(t => t.id !== taskId));
-    } catch (error) {
-      console.error('Failed to delete task:', error);
+      fetchTasks(); // Refetch to get correct state
     }
   };
 
@@ -57,7 +52,6 @@ export function useTasks(projectId: string) {
     loading,
     createTask,
     updateTask,
-    deleteTask,
     refetch: fetchTasks,
   };
 }
