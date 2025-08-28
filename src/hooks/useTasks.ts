@@ -43,6 +43,23 @@ export function useTasks(projectId: string) {
     }
   };
 
+  const deleteTask = async (taskId: string) => {
+    // Optimistic update - remove the task immediately
+    const taskToDelete = tasks.find(t => t.id === taskId);
+    setTasks(prev => prev.filter(t => t.id !== taskId));
+    
+    try {
+      await api.delete(`/api/tasks/${taskId}`);
+    } catch (error) {
+      // Revert on error - add the task back
+      console.error('Failed to delete task:', error);
+      if (taskToDelete) {
+        setTasks(prev => [...prev, taskToDelete]);
+      }
+      fetchTasks(); // Refetch to get correct state
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
   }, [projectId]);
@@ -52,6 +69,7 @@ export function useTasks(projectId: string) {
     loading,
     createTask,
     updateTask,
+    deleteTask,
     refetch: fetchTasks,
   };
 }
