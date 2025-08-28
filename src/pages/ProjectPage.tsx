@@ -17,7 +17,7 @@ export function ProjectPage() {
   const { id } = useParams<{ id: string }>();
   const { project, loading, updateProject } = useProject(id!);
   const { tasks, createTask, updateTask, refetch: refetchTasks } = useTasks(id!);
-  const { insights, togglePin, refetch: refetchInsights } = useInsights(id!);
+  const { insights, togglePin } = useInsights(id!);
   const { milestones, createMilestone, updateMilestone, deleteMilestone } = useMilestones(id!);
   const [suggestedSummary, setSuggestedSummary] = useState<string | null>(null);
   const [localInsights, setLocalInsights] = useState<Insight[]>([]);
