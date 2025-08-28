@@ -36,21 +36,55 @@ export function QAAssistant({ projectId, projectName, onTasksCreated }: QAAssist
 
   if (!isOpen) {
     return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110 z-40"
-        aria-label="Open Q&A Assistant"
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {history.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            {history.length}
-          </span>
-        )}
-      </button>
+      <div className="fixed bottom-6 right-6 z-40">
+        {/* Pulsing ring animation */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 animate-ping opacity-20"></div>
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 animate-ping animation-delay-200 opacity-15"></div>
+        
+        {/* Main button */}
+        <button
+          onClick={() => setIsOpen(true)}
+          className="relative group bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 rounded-full shadow-2xl hover:shadow-3xl transform transition-all duration-300 hover:scale-110 active:scale-95"
+          aria-label="Open Q&A Assistant"
+        >
+          {/* Sparkle effect on hover */}
+          <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          
+          {/* Icon with subtle animation */}
+          <svg className="w-8 h-8 relative z-10 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} 
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          
+          {/* Badge for message count */}
+          {history.length > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full min-w-[24px] h-6 px-1 flex items-center justify-center shadow-lg animate-bounce">
+              {history.length}
+            </span>
+          )}
+          
+          {/* "NEW" label for first-time users */}
+          {history.length === 0 && (
+            <span className="absolute -top-2 -right-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+              NEW!
+            </span>
+          )}
+        </button>
+        
+        {/* Tooltip on hover */}
+        <div className="absolute bottom-full right-0 mb-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-300">
+          <div className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+            <div className="font-semibold">AI Project Assistant ✨</div>
+            <div className="text-xs text-gray-300 mt-1">Ask anything about your project</div>
+            <div className="absolute bottom-0 right-8 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
+          </div>
+        </div>
+        
+        {/* Mobile-specific call-to-action text */}
+        <div className="md:hidden absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white px-3 py-1.5 rounded-full shadow-lg border-2 border-blue-600 animate-bounce">
+          <span className="text-xs font-medium text-blue-600 whitespace-nowrap">Tap for AI help!</span>
+        </div>
+      </div>
     );
   }
 

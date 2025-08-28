@@ -23,6 +23,20 @@
 }
 
 @layer utilities {
+  /* Animation delays */
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  /* Enhanced shadow for Q&A button */
+  .shadow-3xl {
+    box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+  }
+
   /* Voice recording animations */
   @keyframes pulse-recording {
     0%, 100% {
