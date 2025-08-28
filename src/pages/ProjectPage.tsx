@@ -11,7 +11,7 @@ import { RecordThoughts } from '../components/projects/RecordThoughts';
 import { InsightsFeed } from '../components/projects/InsightsFeed';
 import { KanbanBoard } from '../components/projects/KanbanBoard';
 import { MilestonesPanel } from '../components/projects/MilestonesPanel';
-import { QAAssistant } from '../components/projects/QAAssistant';
+import { QAPanel } from '../components/projects/QAPanel';
 import { api } from '../lib/api';
 
 export function ProjectPage() {
@@ -67,31 +67,43 @@ export function ProjectPage() {
         onRecorded={refetchInsights}
       />
 
-      {/* Mobile-optimized layout */}
-      <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-6">
-        {/* Tasks section - full width on mobile, 2 cols on desktop */}
-        <div className="lg:col-span-2 order-1 lg:order-1">
+      {/* Main Layout with Q&A Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Left side - Main content (Tasks, Insights, Milestones) */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Tasks section */}
           <KanbanBoard
             tasks={tasks}
             onTaskUpdate={updateTask}
             onTaskCreate={createTask}
             onTaskDelete={deleteTask}
           />
-        </div>
-        
-        {/* Insights and Milestones - stacked on mobile, sidebar on desktop */}
-        <div className="space-y-6 order-2 lg:order-2">
-          <InsightsFeed
-            insights={insights}
-            onPinToggle={togglePin}
-          />
           
-          <MilestonesPanel
-            milestones={milestones}
-            onMilestoneCreate={createMilestone}
-            onMilestoneUpdate={updateMilestone}
-            onMilestoneDelete={deleteMilestone}
-          />
+          {/* Two column layout for Insights and Milestones on larger screens */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InsightsFeed
+              insights={insights}
+              onPinToggle={togglePin}
+            />
+            
+            <MilestonesPanel
+              milestones={milestones}
+              onMilestoneCreate={createMilestone}
+              onMilestoneUpdate={updateMilestone}
+              onMilestoneDelete={deleteMilestone}
+            />
+          </div>
+        </div>
+
+        {/* Right side - Q&A Panel (sticky on desktop) */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-4">
+            <QAPanel
+              projectId={project.id}
+              projectName={project.name}
+              onTasksCreated={refetchTasks}
+            />
+          </div>
         </div>
       </div>
 
@@ -102,13 +114,6 @@ export function ProjectPage() {
           onReject={() => setSuggestedSummary(null)}
         />
       )}
-
-      {/* Q&A Assistant - floating button/panel */}
-      <QAAssistant 
-        projectId={project.id}
-        projectName={project.name}
-        onTasksCreated={refetchTasks}
-      />
     </div>
   );
 }
