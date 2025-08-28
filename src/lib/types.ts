@@ -1,3 +1,4 @@
+// src/lib/types.ts - Complete types with Q&A interfaces
 export interface Project {
   id: string;
   userId: string;
@@ -51,4 +52,16 @@ export interface Milestone {
   description?: string;
   dueDate?: string;
   createdAt: string;
+}
+
+export interface QAQuestion {
+  id: string;
+  projectId: string;
+  question: string;
+  answer: string;
+  suggestions: string[];
+  examples?: string[];
+  helpful?: boolean | null;
+  createdAt: string;
+  suggestedTasks?: Array<{ title: string; description?: string }>;
 }
