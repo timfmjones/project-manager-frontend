@@ -12,13 +12,10 @@ export function QAChat({
   suggestions,
   asking,
   onAskQuestion,
-  currentAnswer,
-  projectName,
 }: QAChatProps) {
   const [question, setQuestion] = useState('');
   const [includeExamples, setIncludeExamples] = useState(true);
   const [messages, setMessages] = useState<Array<{ type: 'question' | 'answer' | 'error'; content: any }>>([]);
-  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -36,7 +33,6 @@ export function QAChat({
 
     const userQuestion = question.trim();
     setQuestion('');
-    setError(null);
     
     // Add question to messages
     setMessages(prev => [...prev, { type: 'question', content: userQuestion }]);
@@ -47,7 +43,6 @@ export function QAChat({
         setMessages(prev => [...prev, { type: 'answer', content: response }]);
       }
     } catch (err: any) {
-      setError(err.message);
       setMessages(prev => [...prev, { type: 'error', content: err.message }]);
     }
   };

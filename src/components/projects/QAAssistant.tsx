@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useQA } from '../../hooks/useQA';
 import { QAChat } from './QAChat';
 import { QAHistory } from './QAHistory';
-import { formatDateTime } from '../../lib/utils';
 
 interface QAAssistantProps {
   projectId: string;
